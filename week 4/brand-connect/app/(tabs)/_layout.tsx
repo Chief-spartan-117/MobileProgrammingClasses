@@ -1,9 +1,10 @@
 import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Tabs } from "expo-router";
+import { Home, Store } from "lucide-react-native";
 import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 // import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function TabLayout() {
@@ -79,6 +80,65 @@ export default function TabLayout() {
       </LinearGradient> */}
       {/* <GestureHandlerRootView style={{ flex: 1 }}> */}
       <Tabs
+        tabBar={(props) => (
+          <View
+            style={{
+              // marginBottom: 8,
+              flexDirection: "row",
+              marginHorizontal: "auto",
+              backgroundColor: "white",
+              paddingHorizontal: 8,
+              paddingVertical: 8,
+              borderRadius: 999,
+              position: "absolute",
+              bottom: 16,
+              left: "50%",
+              transform: [
+                {
+                  translateX: "-50%",
+                },
+              ],
+              // gap: 8,
+            }}
+          >
+            {props.state.routes.map((route, index) => {
+              const focused = props.state.index === index;
+              const { options } = props.descriptors[route.key];
+
+              const icon = options.tabBarIcon
+                ? options.tabBarIcon({
+                    focused,
+                    color: focused ? "#4260B2" : "black",
+                    size: 0,
+                  })
+                : null;
+              return (
+                <TouchableOpacity
+                  style={{
+                    paddingHorizontal: 42,
+                    paddingVertical: 8,
+                    borderRadius: 999,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: focused ? "#ECEFF7" : "transparent",
+                  }}
+                  key={route.key}
+                  onPress={() => props.navigation.navigate(route.name)}
+                >
+                  {icon}
+                  <Text
+                    style={{
+                      color: focused ? "#4260B2" : "black",
+                      fontFamily: "EuclidCircularB",
+                    }}
+                  >
+                    {options.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
@@ -86,21 +146,17 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="index"
+          name="home"
           options={{
             title: "Home",
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="house.fill" color={"black"} />
-            ),
+            tabBarIcon: ({ color }) => <Home size={28} color={color} />,
           }}
         />
         <Tabs.Screen
-          name="explore"
+          name="inventory"
           options={{
-            title: "Explore",
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="paperplane.fill" color={color} />
-            ),
+            title: "Inventory",
+            tabBarIcon: ({ color }) => <Store size={28} color={color} />,
           }}
         />
       </Tabs>

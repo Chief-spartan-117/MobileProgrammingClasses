@@ -68,7 +68,8 @@
                   },
                   {
                     "path": "./assets/fonts/EuclidCircularB-Bold.ttf",
-                    "weight": 700
+                    "weight": 700,
+                    "style": "bold"
                   }
                 ]
               }

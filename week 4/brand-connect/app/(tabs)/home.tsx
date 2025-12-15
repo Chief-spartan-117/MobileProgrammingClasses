@@ -1,15 +1,19 @@
-import { LinearGradient } from "expo-linear-gradient";
-import { Bell, Building } from "lucide-react-native";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { onValue, ref } from "firebase/database";
+import Expense from "@/components/pages/home/expense";
+import Fab from "@/components/pages/home/fab";
+import Transactions from "@/components/pages/home/transactions";
 import { database } from "@/utils/firebase";
+import { LinearGradient } from "expo-linear-gradient";
+import { onValue, ref } from "firebase/database";
+import { Bell, Building } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const inset = useSafeAreaInsets();
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<
+    { amount: string; description: string; createdAt: string }[]
+  >([{ amount: "", description: "", createdAt: "" }]);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
@@ -17,7 +21,11 @@ export default function HomeScreen() {
     const unsubscribe = onValue(transactionsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const transactions = Object.values(data);
+        const transactions = Object.values(data) as {
+          amount: string;
+          description: string;
+          createdAt: string;
+        }[];
         setTransactions(transactions);
 
         const totalAmount = transactions.reduce(
@@ -36,7 +44,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <View>
+      <ScrollView>
         <LinearGradient
           colors={["rgba(36,53,98,1)", "rgba(46,78,164,1)"]}
           style={{
@@ -201,65 +209,11 @@ export default function HomeScreen() {
               </View>
             </View>
           </View>
-          <View style={{ paddingTop: 150, paddingHorizontal: 24, gap: 6 }}>
-            <Text
-              style={{
-                fontFamily: "EuclidCircularB",
-                fontWeight: "bold",
-                fontSize: 16,
-              }}
-            >
-              Transactions
-            </Text>
-            {transactions.map((e, index) => (
-              <View
-                key={index}
-                style={{
-                  backgroundColor: "#ffffff",
-                  justifyContent: "space-between",
-                  flexDirection: "row",
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                  borderRadius: 8,
-                }}
-              >
-                <View>
-                  <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                    {e.amount}
-                  </Text>
-                  <Text style={{ color: "#8d8d8dff" }}>{e.description}</Text>
-                </View>
-                <Text>{new Date(e.createdAt).toLocaleString()}</Text>
-              </View>
-            ))}
-          </View>
+          <Transactions transactions={transactions}></Transactions>
+          <Expense />
         </View>
-      </View>
-      <View style={{ flex: 1 }}>
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 24,
-            right: 24,
-            backgroundColor: "#2E4EA4",
-            width: 56,
-            height: 56,
-            borderRadius: 8,
-            justifyContent: "center",
-            alignItems: "center",
-            elevation: 5,
-            shadowColor: "#000",
-            shadowOpacity: 0.8,
-            shadowOffset: { width: 0, height: 1 },
-            shadowRadius: 8,
-          }}
-          onPress={() => router.push("/modal")}
-        >
-          <Text style={{ color: "white", fontSize: 28, lineHeight: 28 }}>
-            +
-          </Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
+      <Fab />
     </>
   );
 }
